@@ -2,10 +2,11 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { GlobalExceptionFilter } from './global/global-exception-filter';
 import { CustomZodValidationPipe } from './global/pipes/zod.validation.pipe';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-
+  app.use(cookieParser());
   app.enableCors({
     origin: '*', // Change this to your frontend URL if needed
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
