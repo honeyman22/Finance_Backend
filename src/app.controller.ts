@@ -20,7 +20,7 @@ export class AppController {
                       "
                     >
                       <div style="margin: 20rem; text-align: center; display: flex; flex-direction: column;">
-                        <h1 style="color: #050a22; font-size:42px;">Welcome to our Appointment Backend Server📡</h1>
+                        <h1 style="color: #050a22; font-size:42px;">Welcome to our Finance Management Backend Server📡</h1>
                         <p style="color: #3366ff; font-size:24px;">Server is currently active...........</p>
                       </div>
                     </body>
