@@ -12,10 +12,10 @@ export class AuthController {
   async login(@Body() user: LoginUserDto, @Res() res: Response) {
     const { data } = await this.authService.login(user);
     res.cookie('token', data.token, {
-      httpOnly: false, // Prevents client-side JavaScript access (XSS protection)
-      secure: process.env.NODE_ENV === 'production', // Only HTTPS in production
-      sameSite: 'strict', // Prevent CSRF attacks
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days expiry
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax', // Or 'none' if cross-site and using HTTPS
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
     return res.json({
       message: 'Login successful',
