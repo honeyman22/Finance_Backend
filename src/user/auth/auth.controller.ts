@@ -14,7 +14,6 @@ export class AuthController {
     res.cookie('token', data.token, {
       httpOnly: true, // Prevents client-side JavaScript access (XSS protection)
       secure: process.env.NODE_ENV === 'production', // Only HTTPS in production
-      sameSite: 'strict', // Prevent CSRF attacks
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days expiry
     });
     return res.json({
