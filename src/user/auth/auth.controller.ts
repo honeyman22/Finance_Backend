@@ -13,7 +13,7 @@ export class AuthController {
     const { data } = await this.authService.login(user);
     res.cookie('token', data.token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
+      secure: false,
       sameSite: 'lax', // Or 'none' if cross-site and using HTTPS
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
