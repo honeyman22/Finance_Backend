@@ -8,7 +8,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser());
   app.enableCors({
-    origin: 'http://localhost:5173', // Change this to your frontend URL if needed
+    origin: 'https://finance-management-system-nine.vercel.app/', // Change this to your frontend URL if needed
     credentials: true,
     allowedHeaders:
       'Origin, X-Requested-With, Content-Type, Accept, Authorization',
