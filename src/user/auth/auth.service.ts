@@ -34,7 +34,7 @@ export class AuthService {
     const payload = {
       id: isUserExits.id,
       email: isUserExits.email,
-      name: isUserExits.name,
+      name: isUserExits.fullName,
       user_type: isUserExits.user_type,
     };
 
@@ -70,7 +70,7 @@ export class AuthService {
     const newUser = await this.databaseService.user.create({
       data: {
         email: user.email,
-        name: user.name,
+        fullName: user.name,
         password: hashedPassword,
         phoneNumber: user.phoneNumber,
         user_type: user.user_type,
@@ -79,7 +79,7 @@ export class AuthService {
 
     const payload = {
       sub: newUser.id,
-      name: newUser.name,
+      name: newUser.fullName,
       email: newUser.email,
     };
     const token = this.jwtService.sign(payload);
@@ -95,7 +95,7 @@ export class AuthService {
       message: 'Register successfully',
       data: {
         id: updatedUser.id,
-        name: updatedUser.name,
+        name: updatedUser.fullName,
         email: updatedUser.email,
       },
     };
