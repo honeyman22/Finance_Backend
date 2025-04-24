@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { getPaginationParams } from 'src/utils/pagination';
 
 @Injectable()
 export class DepositService {
@@ -156,5 +157,69 @@ export class DepositService {
       },
     });
     return updateDeposit;
+  }
+
+  async getAllDeposits(page: number, limit: number, userId: string) {
+    const deposits = await this.databaseService.deposit.findMany({
+      where: {
+        userId: userId,
+        isPaid: true,
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        depositDate: 'desc',
+      },
+      select: {
+        id: true,
+        amount: true,
+        depositDate: true,
+        paymentMethod: true,
+        fine: true,
+        status: true,
+        receipt: true,
+      },
+    });
+    return {
+      message: 'Deposits fetched successfully',
+      pagination: getPaginationParams(page, limit, deposits.length),
+      data: deposits,
+    }; // Adjust the where clause as needed
+  }
+
+  async getDepositSummary(userId: string) {
+    const deposits = await this.databaseService.deposit.findMany({
+      where: {
+        userId: userId,
+        isPaid: true,
+        status: 'approved',
+      },
+      select: {
+        amount: true,
+        depositDate: true,
+        fine: true,
+        year: true,
+        month: true,
+      },
+    });
+
+    const totalDeposits = deposits.reduce(
+      (acc, deposit) => acc + deposit.amount,
+      0,
+    );
+    const totalFines = deposits.reduce((acc, deposit) => acc + deposit.fine, 0);
+    const numberOfDeposits = deposits.length;
+    const thisYearDeposits = deposits
+      .filter((deposit) => deposit.year === new Date().getFullYear())
+      .map((deposit) => deposit.month);
+    return {
+      message: 'Deposit summary fetched successfully',
+      data: {
+        totalDeposits,
+        totalFines,
+        numberOfDeposits,
+        thisYearDeposits,
+      },
+    };
   }
 }
