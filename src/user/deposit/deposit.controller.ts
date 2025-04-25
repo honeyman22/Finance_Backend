@@ -1,7 +1,17 @@
-import { Controller, Get, Post, Query, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Query,
+  UseGuards,
+  Body,
+  Put,
+  Param,
+} from '@nestjs/common';
 import { DepositService } from './deposit.service';
 import { AuthGuard } from 'src/global/guards/auth.guard';
 import { GetUser } from 'src/global/decorators/get-user.decorator';
+import { DepositDto } from './dtos/create.dto';
 
 @UseGuards(AuthGuard)
 @Controller('deposit')
@@ -25,6 +35,11 @@ export class DepositController {
   @Get('/summary')
   async getDepositSummary(@GetUser('id') userId: string) {
     return this.depositService.getDepositSummary(userId);
+  }
+
+  @Put('update/:id')
+  async updateDeposit(@Param('id') id: string, @Body() depositDto: DepositDto) {
+    return this.depositService.userDepositUpdate(id, depositDto);
   }
   // Define your endpoints here
 }
