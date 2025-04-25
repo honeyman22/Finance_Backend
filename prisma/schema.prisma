@@ -20,14 +20,14 @@ enum UserType {
 
 enum DepositStatus {
   pending
+  paid
   approved
   rejected
 }
 
 enum paymentMethod {
-  cash
   bank_transfer
-  credit_card
+  esewa
 }
 
 model User {

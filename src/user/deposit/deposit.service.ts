@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { DatabaseService } from 'src/database/database.service';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { getPaginationParams } from 'src/utils/pagination';
+import { DepositDto } from './dtos/create.dto';
 
 @Injectable()
 export class DepositService {
@@ -104,12 +105,10 @@ export class DepositService {
     }
   }
 
-  async userDepositUpdate(year: number, month: number, userId: string) {
-    const deposits = await this.databaseService.deposit.findFirst({
+  async userDepositUpdate(depositId: string, depositDto: DepositDto) {
+    const deposits = await this.databaseService.deposit.findUnique({
       where: {
-        userId,
-        year,
-        month,
+        id: depositId,
       },
     });
 
@@ -125,7 +124,8 @@ export class DepositService {
       },
       data: {
         isPaid: true,
-        depositDate: new Date(),
+        status: 'paid',
+        paymentMethod: depositDto.paymentMethod,
       },
     });
     return {
@@ -163,7 +163,6 @@ export class DepositService {
     const deposits = await this.databaseService.deposit.findMany({
       where: {
         userId: userId,
-        isPaid: true,
       },
       skip: (page - 1) * limit,
       take: limit,
@@ -178,6 +177,7 @@ export class DepositService {
         fine: true,
         status: true,
         receipt: true,
+        isPaid: true,
       },
     });
     return {
