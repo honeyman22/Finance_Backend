@@ -13,6 +13,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum loanPaymentStatus {
+  upcoming
+  pending
+  paid
+  approved
+  rejected
+}
+
+enum loanRepaymentFrequency {
+  weekly
+  biweekly
+  monthly
+  quarterly
+  yearly
+}
+
 enum UserType {
   admin
   user
@@ -42,6 +58,7 @@ model User {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   Deposit     Deposit[]
+  Loan        Loan[]
 }
 
 model Deposit {
@@ -60,4 +77,36 @@ model Deposit {
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
   user          User          @relation(fields: [userId], references: [id])
+}
+
+model Loan {
+  id                 String                 @id @default(uuid())
+  userId             String
+  amount             Float
+  totalInterest      Float?
+  loanDuration       Int
+  totalFine          Float?                 @default(0)
+  loanDate           DateTime               @default(now())
+  status             DepositStatus          @default(pending)
+  repaymentFrequency loanRepaymentFrequency @default(monthly)
+  user               User                   @relation(fields: [userId], references: [id])
+  LoanPayment        LoanPayment[]
+  notes              String?
+  createdAt          DateTime               @default(now())
+  updatedAt          DateTime               @updatedAt
+}
+
+model LoanPayment {
+  id          String            @id @default(uuid())
+  isPaid      Boolean           @default(false)
+  loanId      String
+  amount      Float
+  fine        Float             @default(0)
+  paymentDate DateTime
+  receipt     String?
+  notes       String?
+  status      loanPaymentStatus @default(upcoming)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+  loan        Loan              @relation(fields: [loanId], references: [id])
 }
