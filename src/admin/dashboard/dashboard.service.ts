@@ -19,6 +19,7 @@ export class DashboardService {
       _sum: {
         amount: true,
         totalFine: true,
+        totalInterest: true,
       },
       where: {
         status: 'approved',
@@ -30,6 +31,7 @@ export class DashboardService {
         totalDeposit: totalDeposit._sum.amount,
         totalApprovedLoan: TotalApprovedLoan._sum.amount,
         totalFine: totalDeposit._sum.fine + TotalApprovedLoan._sum.totalFine,
+        totalInterest: TotalApprovedLoan._sum.totalInterest,
       },
     };
   }

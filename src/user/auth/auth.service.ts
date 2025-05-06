@@ -51,6 +51,7 @@ export class AuthService {
       message: 'Login success',
       data: {
         token: token,
+        role: isUserExits.user_type,
       },
     };
   }
