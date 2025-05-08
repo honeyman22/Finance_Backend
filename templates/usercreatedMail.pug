@@ -1,0 +1,76 @@
+doctype html
+html
+  head
+    meta(charset="UTF-8")
+    title Account Created Successfully
+    style.
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f3f4f6;
+        padding: 20px;
+        margin: 0;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background-color: #ffffff;
+        padding: 30px;
+        text-align: center;
+      }
+      .logo {
+        width: 150px;
+        margin-bottom: 20px;
+      }
+      .button {
+        display: inline-block;
+        margin-top: 20px;
+        padding: 12px 24px;
+        background-color: #3b82f6;
+        color: #ffffff;
+        text-decoration: none;
+        font-weight: bold;
+        border-radius: 5px;
+      }
+      .footer {
+        margin-top: 30px;
+        font-size: 12px;
+        color: #6b7280;
+        text-align: center;
+      }
+      .footer a {
+        color: #2563eb;
+        text-decoration: none;
+      }
+      .social-icons {
+        margin-top: 10px;
+      }
+      .social-icons img {
+        width: 20px;
+        margin: 0 5px;
+      }
+  body
+    .container
+      img.logo(src='cid:logo', alt='Brother Finance')
+      h2 Welcome to Brother Finance!
+      p Hello #{name},
+      p
+        | Your account has been successfully created.
+      p
+        strong To get started, please set your password.
+      p Click the button below to create your password:
+      a.button(href=resetPasswordUrl) SET PASSWORD
+
+      .footer
+        p For general inquiries or account support, call us at 
+          | #{phone} or email us at 
+          a(href="mailto:" + email) #{email}
+        p We’re excited to have you on board!
+        hr
+        p Brother Finance
+        p Jitpur-Simara 16, Piluwa, Bara
+        a(href='mailto:' + email) #{email}
+        .social-icons
+          a(href="https://www.instagram.com", target="_blank")
+            img(src="https://i.imgur.com/Z7lZQ4T.png", alt="Instagram")
+          a(href="https://www.facebook.com", target="_blank")
+            img(src="https://i.imgur.com/h4fllVn.png", alt="Facebook")

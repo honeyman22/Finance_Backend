@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum UserStatus {
+  inactive
+  active
+  deactivate
+}
+
 enum loanPaymentStatus {
   upcoming
   pending
@@ -47,18 +53,20 @@ enum paymentMethod {
 }
 
 model User {
-  id          String    @id @default(uuid())
-  email       String    @unique
-  fullName    String
-  password    String
-  phoneNumber String    @unique
-  token       String?
-  user_type   UserType  @default(user)
-  image       String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  Deposit     Deposit[]
-  Loan        Loan[]
+  id             String     @id @default(uuid())
+  email          String     @unique
+  fullName       String
+  password       String
+  phoneNumber    String     @unique
+  token          String?
+  user_type      UserType   @default(user)
+  image          String?
+  activationDate DateTime
+  status         UserStatus @default(inactive)
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  Deposit        Deposit[]
+  Loan           Loan[]
 }
 
 model Deposit {

@@ -2,12 +2,13 @@ import {
   BadRequestException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { DatabaseService } from 'src/database/database.service';
 import * as bcrypt from 'bcryptjs';
 import { LoginUserDto } from './dtos/login.dto';
-import { SigninUserDto } from './dtos/signin.dto';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -56,48 +57,42 @@ export class AuthService {
     };
   }
 
-  async register(user: SigninUserDto) {
-    const isUserExits = await this.databaseService.user.findUnique({
+  async resetPassword(token: string, password: string) {
+    let payload;
+    try {
+      payload = this.jwtService.verify(token); // Verify signature and expiry
+    } catch (error) {
+      throw new UnauthorizedException(
+        error.name === 'TokenExpiredError'
+          ? 'Reset token has expired'
+          : 'Invalid reset token',
+      );
+    }
+    const user = await this.databaseService.user.findUnique({
       where: {
-        email: user.email,
+        id: payload['sub'],
       },
     });
-
-    if (isUserExits) throw new BadRequestException('User already exists');
-
-    const hashedPassword = await bcrypt.hash(user.password, 10);
-
-    const newUser = await this.databaseService.user.create({
-      data: {
-        email: user.email,
-        fullName: user.name,
-        password: hashedPassword,
-        phoneNumber: user.phoneNumber,
-        user_type: user.user_type,
-      },
-    });
-
-    const payload = {
-      sub: newUser.id,
-      name: newUser.fullName,
-      email: newUser.email,
+    const newpayload = {
+      sub: user.id,
+      name: user.fullName,
+      email: user.email,
     };
-    const token = this.jwtService.sign(payload);
-    const updatedUser = await this.databaseService.user.update({
+    const newtoken = this.jwtService.sign(newpayload);
+    if (!user) throw new NotFoundException('User not found');
+    const hashedPassword = await bcrypt.hash(password, 10);
+    await this.databaseService.user.update({
       where: {
-        id: newUser.id,
+        id: payload['sub'],
       },
       data: {
-        token: token,
+        password: hashedPassword,
+        token: newtoken,
+        status: 'active',
       },
     });
     return {
-      message: 'Register successfully',
-      data: {
-        id: updatedUser.id,
-        name: updatedUser.fullName,
-        email: updatedUser.email,
-      },
+      message: 'Password reset successfully',
     };
   }
 }
