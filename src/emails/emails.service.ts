@@ -21,7 +21,30 @@ export class ExampleService {
       throw error; // Optionally rethrow the error
     }
   }
-
+  async sendWelcomeEmail(data: {
+    name: string;
+    resetPasswordUrl: string;
+    phone: string;
+    email: string;
+  }) {
+    try {
+      await this.mailerService.sendMail({
+        to: data.email, // list of receivers
+        from: 'noreply@nestjs.com', // sender address
+        subject: 'Welcome to Our Platform! 🎉',
+        template: './usercreatedMail', // relative to 'templates' folder, no extension
+        context: {
+          name: data.name,
+          phone: data.phone,
+          email: data.email,
+          resetPasswordUrl: data.resetPasswordUrl,
+        },
+      });
+    } catch (error) {
+      console.error('Error sending mail:', error);
+      throw error; // Optionally rethrow the error
+    }
+  }
   public async example() {
     try {
       await this.mailerService.sendMail({
