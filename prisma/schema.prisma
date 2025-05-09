@@ -62,11 +62,12 @@ model User {
   user_type      UserType   @default(user)
   image          String?
   activationDate DateTime
+  isFirstTime    Boolean
   status         UserStatus @default(inactive)
   createdAt      DateTime   @default(now())
   updatedAt      DateTime   @updatedAt
-  Deposit        Deposit[]
-  Loan           Loan[]
+  deposit        Deposit[]
+  loan           Loan[]
 }
 
 model Deposit {
