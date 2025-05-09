@@ -3,6 +3,7 @@ import { DatabaseService } from 'src/database/database.service';
 import { CreateUserDto } from './dtos/create-user.dtos';
 import { ExampleService } from 'src/emails/emails.service';
 import { JwtService } from '@nestjs/jwt';
+import { getPaginationParams } from 'src/utils/pagination';
 
 @Injectable()
 export class AdminUserService {
@@ -14,11 +15,15 @@ export class AdminUserService {
 
   //Get all users
 
-  async getAllUsers() {
-    // Logic to fetch all users from the database
+  async getAllUsers(page: number, limit: number) {
     const users = await this.databaseService.user.findMany({
       where: {
         user_type: 'user',
+      },
+      skip: (page - 1) * limit,
+      take: limit,
+      orderBy: {
+        createdAt: 'desc',
       },
       select: {
         id: true,
@@ -28,23 +33,52 @@ export class AdminUserService {
         phoneNumber: true,
         activationDate: true,
         status: true,
-        Deposit: {
+        deposit: {
           where: { isPaid: true },
-          select: {
-            amount: true,
-          },
+          select: { amount: true },
         },
-        Loan: {
-          where: { status: 'approved' },
+        loan: {
+          orderBy: {
+            createdAt: 'desc',
+          },
+          take: 1,
           select: {
             amount: true,
+            status: true,
+            createdAt: true,
           },
         },
       },
     });
+
+    const formattedUsers = users.map((user) => {
+      const totalDepositAmount = user.deposit.reduce(
+        (sum, d) => sum + d.amount,
+        0,
+      );
+      const paidDepositCount = user.deposit.length;
+      const totalLoanAmount = user.loan[0]?.amount || 0;
+      const loanStatus = user.loan[0]?.status || null;
+
+      return {
+        id: user.id,
+        name: user.fullName,
+        email: user.email,
+        image: user.image,
+        phoneNumber: user.phoneNumber,
+        status: user.status,
+        activationDate: user.activationDate,
+        depositAmount: totalDepositAmount,
+        depositDuration: paidDepositCount + ' months',
+        loanAmount: totalLoanAmount,
+        loanStatus: loanStatus,
+      };
+    });
+
     return {
       message: 'Users fetched successfully',
-      data: users,
+      pagination: getPaginationParams(page, limit, users.length),
+      data: formattedUsers,
     };
   }
 
@@ -68,9 +102,10 @@ export class AdminUserService {
       data: {
         email: user.email,
         fullName: user.name,
-        password: user.password,
+        password: 'Hello@123',
         phoneNumber: user.phoneNumber,
         activationDate: ISoFarmat,
+        isFirstTime: true,
       },
     });
     const payload = {
@@ -98,6 +133,27 @@ export class AdminUserService {
     return {
       message: 'User created successfully',
       data: newUser,
+    };
+  }
+
+  async deactivateUser(id: string) {
+    const user = await this.databaseService.user.findUnique({
+      where: {
+        id: id,
+      },
+    });
+    if (!user) throw new BadRequestException('User not found');
+    const updatedUser = await this.databaseService.user.update({
+      where: {
+        id: id,
+      },
+      data: {
+        status: 'deactivate',
+      },
+    });
+    return {
+      message: 'User deactivated successfully',
+      data: updatedUser,
     };
   }
 }

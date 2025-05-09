@@ -68,11 +68,16 @@ export class AuthService {
           : 'Invalid reset token',
       );
     }
+
     const user = await this.databaseService.user.findUnique({
       where: {
         id: payload['sub'],
       },
     });
+
+    if (!user.isFirstTime) {
+      throw new BadRequestException('You have already reset your password');
+    }
     const newpayload = {
       sub: user.id,
       name: user.fullName,
@@ -89,6 +94,7 @@ export class AuthService {
         password: hashedPassword,
         token: newtoken,
         status: 'active',
+        isFirstTime: false,
       },
     });
     return {
